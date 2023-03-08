@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Ahmadreza Amini">
+    <title>Mandrill events</title>
+
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"
+        integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k" crossorigin="anonymous">
+        </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+    <style>
+        html,
+        body {
+            overflow-x: hidden;
+            /* Prevent scroll on narrow devices */
+        }
+
+        header .logo-link {
+            display: inline-block;
+            height: 50%;
+            width: 20%;
+            margin-right: 30px;
+        }
+
+        .bg-purple {
+            background-color: #6f42c1;
+        }
+    </style>
+
+    <script>
+        var socket = null;
+
+        function toggleConnectionStatus(status, remove_cls, add_cls) {
+            var x = document.getElementById("alert");
+
+            x.innerHTML = `<h6>Status: ${status}</h6>`;
+            x.classList.remove(`alert-${remove_cls}`);
+            x.classList.add(`alert-${add_cls}`);
+        }
+
+        function btnOnclick() {
+            const url = document.getElementById("wsUrl").value
+
+            if (document.getElementById("btn").value === "connect") {
+                socket = io.connect(url);
+                socket.emit("message", { "event": "connect" })
+            } else if (document.getElementById("btn").value === "disconnect") {
+                socket.emit("message", { "event": "disconnect" })
+                socket.disconnect()
+            }
+
+            socket.on('connect', () => {
+                document.getElementById("btn").innerText = "Disconnect";
+                document.getElementById("btn").value = "disconnect";
+                toggleConnectionStatus("Connected", "danger", "success")
+            })
+
+            socket.on("disconnect", () => {
+                document.getElementById("btn").innerText = "Connect";
+                document.getElementById("btn").value = "connect";
+                toggleConnectionStatus("Disconnected", "success", "danger")
+            })
+
+            socket.on("connect_error", (error) => {
+                toggleConnectionStatus("Connection Error", "success", "danger")
+            });
+
+            socket.onAny((eventName, msg) => {
+                // Get events list div to add events boxes to it
+                const boxWrapper = document.getElementById("eventsBox");
+
+                for (event of msg) {
+                    // Create event div box
+                    const box = document.createElement("div");
+
+                    // Add css classes to event div box
+                    box.classList.add("d-flex");
+                    box.classList.add("text-muted");
+                    box.classList.add("pt-3");
+
+                    // Add event box data to event box div
+                    box.innerHTML = `
+                    <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32"
+                        xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32"
+                        preserveAspectRatio="xMidYMid slice" focusable="false">
+                        
+                        <rect width="100%" height="100%" fill="#007bff" /><text x="50%" y="50%" fill="#007bff"
+                            dy=".3em">32x32</text>
+                    </svg>
+                    <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
+                        <div class="d-flex justify-content-between">
+                          <strong class="text-gray-dark">${event.event}</strong>
+                          <!-- <a href="#">details</a> -->
+                        </div>
+                        <span class="d-block">${event.ts}</span>
+                    </div>`;
+
+                    // Add event div box to events list div
+                    boxWrapper.appendChild(box);
+
+                    // Scroll to bottom always show last events
+                    var element = document.getElementById("eventsBox");
+                    element.scrollTop = element.scrollHeight;
+                }
+            })
+        }
+
+        function clearEventBox() {
+            // Clear events list
+            document.getElementById("eventsBox").innerHTML = '';
+        }
+    </script>
+</head>
+
+<body class="bg-light">
+    <main class="container">
+
+        <!-- Header section -->
+        <header class="p-3 mb-3 border-bottom">
+            <div class="container">
+                <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                    <a href="#" class="logo-link">
+                        <img alt=""
+                            data-src="https://www.workgenius.com/wp-content/themes/workgenius/images/logo-blue.svg"
+                            class="logo lazyloaded"
+                            src="https://www.workgenius.com/wp-content/themes/workgenius/images/logo-blue.svg"
+                            data-pagespeed-url-hash="31059146">
+                    </a>
+
+                    <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                        <li><a href="#" class="nav-link px-2 link-secondary">Home</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+        <!-- Header section -->
+
+        <!-- Connection to websocket section -->
+        <div class="d-flex justify-content-center">
+            <div class="input-group w-auto">
+                <input type="text" class="form-control" placeholder="Websocket URL" aria-label="Websocket URL"
+                    id="wsUrl" aria-describedby="button-addon1" value="http://127.0.0.1:5000/events" />
+                <button class="btn btn-primary" type="button" id="btn" data-mdb-ripple-color="dark"
+                    onclick="btnOnclick()" value="connect" data-dismiss="alert">
+                    Connect
+                </button>
+            </div>
+            <div class="alert d-flex text-center alert-danger m-1 p-2" style="padding:10px" id="alert">
+                <h6>Status: Disonnected!</h6>
+            </div>
+        </div>
+        <!-- Connection to websocket section -->
+
+        <!-- Events list header -->
+        <div class="d-flex justify-content-between p-3 my-3 text-white bg-purple rounded shadow-sm">
+            <div class="lh-1">
+                <h6 class="h6 mb-0 text-white lh-1">Recent events</h6>
+                <small>Show events as they come.</small>
+            </div>
+            <button type="button" class="btn btn-light" onclick="clearEventBox()">Clear</button>
+        </div>
+        <!-- Events list header -->
+
+        <!-- Events list section -->
+        <div class="my-3 p-3 bg-body rounded shadow-sm overflow-auto" id="eventsBox" style="height: 500px;">
+        </div>
+        <!-- Events list section -->
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

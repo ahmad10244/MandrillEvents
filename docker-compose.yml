@@ -1,0 +1,33 @@
+version: '3.7'
+services:
+  web:
+    build: .
+    ports:
+      - 5000:8000
+    environment:
+      MONGODB: "mongodb://root:rootpassword@mongodb:27017"
+      SECRET_KEY: -l#[^89:Bjn^V7V7HGv*
+    depends_on:
+      - mongodb
+    networks:
+      - backend
+
+  mongodb:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+    networks:
+      - backend
+
+
+volumes:
+  mongodb_data_container:
+
+networks:
+  backend:
+    driver: bridge
