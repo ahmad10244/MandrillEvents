@@ -16,7 +16,7 @@ services:
       - backend
 
   mongodb:
-    image: mongo:latest
+    image: mongo:6.0.4
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
