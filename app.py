@@ -10,15 +10,15 @@ from flask import Flask, render_template, request, jsonify
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "aN0t4wZwOwdhe08AVk6wTYZkmTt4YlSK")
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*", engineio_logger=True, async_mode="gevent")
 
 # MongoDB client
-mongo_uri = os.getenv('MONGODB', "mongodb://root:rootpassword@127.0.0.1:27017")
+mongo_uri = os.getenv('MONGODB')
 mongo_client = pymongo.MongoClient(mongo_uri)
-db = mongo_client.db
-events_collection = db.events
+db = mongo_client[os.getenv("MONGODB_DATABSE")]
+events_collection = db[os.getenv("MONGODB_DATABSE_COLLECTION")]
 
 
 logger = logging.getLogger(__name__)
