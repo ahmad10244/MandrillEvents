@@ -6,6 +6,7 @@ import datetime
 import pymongo
 from flask_cors import CORS
 from flask_socketio import SocketIO
+from flask.logging import wsgi_errors_stream
 from flask import Flask, render_template, request, jsonify
 
 
@@ -21,7 +22,13 @@ db = mongo_client[os.getenv("MONGODB_DATABSE")]
 events_collection = db[os.getenv("MONGODB_DATABSE_COLLECTION")]
 
 
-logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s - %(name)s -> %(levelname)s: %(message)s',
+                            datefmt="%Y-%m-%d %H:%M:%S",
+                            handlers=[
+                                logging.StreamHandler(stream=wsgi_errors_stream),
+                            ],
+                            level=logging.INFO)
+logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
@@ -29,9 +36,9 @@ logger.setLevel(logging.INFO)
 def handle_message(data):
     event = data.get("event")
     if event == "connect":
-        logger.info(f"Client connected SID:{request.sid}")
+        logger.info(f"\n{50*'='} \n Client connected SID:{request.sid} \n{50*'='}")
     elif event == "disconnect":
-        logger.info(f"Client disconnected SID:{request.sid}")
+        logger.info(f"\n{50*'='} \n Client disconnected SID:{request.sid} \n{50*'='}")
 
 
 @app.route("/event", methods=["POST"])
