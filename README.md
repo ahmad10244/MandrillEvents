@@ -31,7 +31,7 @@ Insert app websocket url in the input box (`http://<ip>:5000/events`) and click 
 
 - Goto Mandrill Webhooks setting [Link](https://mandrillapp.com/settings/webhooks)
 - Click on `Add a webhook` button
-- Insert app webhook url on `Post To URL` input box. The app webhook url is `http://<ip>:5000/events`
+- Insert app webhook url on `Post To URL` input box. The app webhook url is `http://<ip>:5000/event`
 - You can test app with `send test` button
 
 ## How it works
