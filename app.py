@@ -55,8 +55,13 @@ def get_events():
     
     try:
         body = request.form.to_dict()
-        body = body["mandrill_events"]
+        body = body.get("mandrill_events")
+        if not body:
+            return jsonify({"msg": "Missing mandrill_events in received data"}), 400
+        
         body = json.loads(body)
+        if len(body) == 0:
+            return jsonify({"msg": "No events received data"}), 400
 
         # Parse received data body
         body = list(map(lambda x: parse_body(x), body))
