@@ -76,7 +76,12 @@
             })
 
             socket.on("connect_error", (error) => {
-                toggleConnectionStatus("Connection Error", "success", "danger")
+                toggleConnectionStatus("Connection Error", "success", "danger");
+                document.getElementById("btn").innerHTML = `
+                Connecting
+                <span class="spinner-grow spinner-grow-sm text-danger" role="status" aria-hidden="true"></span>
+                `;
+                document.getElementById("btn").classList.add("disabled");
             });
 
             socket.onAny((eventName, msg) => {
