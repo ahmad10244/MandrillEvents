@@ -4,9 +4,12 @@ services:
     build: .
     ports:
       - 5000:8000
+    restart: always
     environment:
-      MONGODB: "mongodb://root:rootpassword@mongodb:27017"
       SECRET_KEY: -l#[^89:Bjn^V7V7HGv*
+      MONGODB: "mongodb://root:rootpassword@mongodb:27017"
+      MONGODB_DATABSE: db
+      MONGODB_DATABSE_COLLECTION: events
     depends_on:
       - mongodb
     networks:
@@ -14,6 +17,7 @@ services:
 
   mongodb:
     image: mongo:latest
+    restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: rootpassword
