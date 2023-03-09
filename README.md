@@ -84,3 +84,13 @@ or using `gunicorn`
 ``` bash
 gunicorn -k gevent -w 1 app:app -b 0.0.0.0:5000
 ```
+
+## Running Tests
+
+----
+Use pytest to test project.
+
+* `python -m pytest` to discover and run all tests from the current directory
+* `python -m pytest -v` to explicitly print the result of each test as it is run
+* `python -m pytest tests/functional/test_webhook_api.py` to run only the webhook API function tests
+* `python -m pytest tests/functional/test_socketio.py` to run only the socetio function tests
