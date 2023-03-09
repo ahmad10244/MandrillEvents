@@ -2,12 +2,16 @@
 
 ## Description
 
+----
+
 This project captures Mandrills events, Store them for later usage and notify some \
 simple user interface in real time about those events. \
 Every time new event received from Mandrill it will be saved on database \
 and also notify to user interface.
 
 ## Docker
+
+----
 
 > ### **Step 1** - Download the code from the GitHub repository (using `GIT`)
 
@@ -36,6 +40,8 @@ Insert app websocket url in the input box (`http://<ip>:5000/events`) and click 
 
 ## How it works
 
+----
+
 This app use [MongoDB](https://www.mongodb.com/) for saving captured events\
 and [Flask](https://flask.palletsprojects.com/) For the webhook API \
 and [Flask-SocketIO](https://flask-socketio.readthedocs.io/) for websocket. \
@@ -45,6 +51,8 @@ After an event (or events) is got through the backend webhook API from Mandrill,
 and also the app will send a notification message through the websocket to the user interface.
 
 ## Contributing
+
+----
 
 > ### **Step 1**
 
