@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
+    <meta name="description" content="Mandrill events">
     <meta name="author" content="Ahmadreza Amini">
     <title>Mandrill events</title>
 
@@ -42,6 +42,7 @@
             x.innerHTML = `<h6>Status: ${status}</h6>`;
             x.classList.remove(`alert-${remove_cls}`);
             x.classList.add(`alert-${add_cls}`);
+            document.getElementById("btn").classList.remove('disabled');
         }
 
         function btnOnclick() {
@@ -49,22 +50,29 @@
 
             if (document.getElementById("btn").value === "connect") {
                 socket = io.connect(url);
-                socket.emit("message", { "event": "connect" })
+                socket.emit("message", { "event": "connect" });
             } else if (document.getElementById("btn").value === "disconnect") {
-                socket.emit("message", { "event": "disconnect" })
-                socket.disconnect()
+                let myPromise = new Promise(() => {
+                    socket.emit("message", { "event": "disconnect" })
+                });
+                // Promise with delay to make sure disconnect message sent.
+                myPromise.then(
+                    setTimeout(() => {
+                        socket.disconnect()
+                    }, 100)
+                )
             }
 
             socket.on('connect', () => {
                 document.getElementById("btn").innerText = "Disconnect";
                 document.getElementById("btn").value = "disconnect";
-                toggleConnectionStatus("Connected", "danger", "success")
+                toggleConnectionStatus("Connected", "danger", "success");
             })
 
             socket.on("disconnect", () => {
                 document.getElementById("btn").innerText = "Connect";
                 document.getElementById("btn").value = "connect";
-                toggleConnectionStatus("Disconnected", "success", "danger")
+                toggleConnectionStatus("Disconnected", "success", "danger");
             })
 
             socket.on("connect_error", (error) => {
