@@ -16,10 +16,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*", engineio_logger=True, async_mode="gevent")
 
 # MongoDB client
-mongo_uri = os.getenv('MONGODB')
-mongo_client = pymongo.MongoClient(mongo_uri)
-db = mongo_client[os.getenv("MONGODB_DATABSE")]
-events_collection = db[os.getenv("MONGODB_DATABSE_COLLECTION")]
+mongo_client = pymongo.MongoClient(os.getenv('MONGODB'))
 
 
 logging.basicConfig(format='%(asctime)s - %(name)s -> %(levelname)s: %(message)s',
@@ -30,6 +27,13 @@ logging.basicConfig(format='%(asctime)s - %(name)s -> %(levelname)s: %(message)s
                             level=logging.INFO)
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+
+def get_mongodb_collection():
+    db = mongo_client[os.getenv("MONGODB_DATABSE")]
+    events_collection = db[os.getenv("MONGODB_DATABSE_COLLECTION")]
+
+    return events_collection
 
 
 @socketio.on('message', namespace="/events")
@@ -68,10 +72,11 @@ def get_events():
 
         try:
             # Insert events to MongoDB
+            events_collection = get_mongodb_collection()
             events_collection.insert_many(body) 
         except pymongo.errors.BulkWriteError:
             raise Exception("MongoDB insert failed")
-        except pymongo.errors.ConnectionFailure as ex:
+        except pymongo.errors.ConnectionFailure:
             raise Exception("MongoDB connection error")
 
         ret = []
