@@ -25,7 +25,7 @@ git clone https://github.com/ahmad10244/MandrillEvents && cd MandrillEvents
 docker-compose up --build
 ```
 
-Visit `http://localhost:5000/` in your browser or simply open `templates/index.html` \
+Visit `http://<ip>:5000/` in your browser or simply open `templates/index.html` \
 in your browser to see the user interface. \
 Insert app websocket url in the input box (`http://<ip>:5000/events`) and click `Connect` button.
 
