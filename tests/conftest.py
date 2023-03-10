@@ -234,6 +234,14 @@ def webhook_events_wrong_json():
 
 
 @pytest.fixture()
+def webhook_events_empty_event_list():
+    """
+    Create empty event_list json object for webhook testing
+    """
+    yield {"mandrill_events": json.dumps([])}
+
+
+@pytest.fixture()
 def socketio_events_emit():
     """
     Create socketio emit events json object

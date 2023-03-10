@@ -32,6 +32,18 @@ def test_new_event_from_mandrill_wrong_form_data(app_client, webhook_events_wron
     assert "msg" in response.text
 
 
+def test_new_event_from_mandrill_empty_events_form_data(app_client, webhook_events_empty_event_list):
+    """
+    Test to check whether the webhook return OK on empty event list form data
+    :param app_client: Pytest Fixture as specified in the ConfTest File
+    :param webhook_events_empty_event_list: Pytest Fixture as specified in the ConfTest File
+    """
+    response = app_client.post("/event",
+                               data=webhook_events_empty_event_list)
+    assert response.status_code == 200
+    assert response.text == ""
+
+
 def test_new_event_from_mandrill_complete_form_data(monkeypatch, app_client, webhook_events_json, mongo_db_patch):
     """
     Test to check whether the webhook return OKon correct form data
