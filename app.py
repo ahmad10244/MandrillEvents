@@ -65,7 +65,7 @@ def get_events():
         
         body = json.loads(body)
         if len(body) == 0:
-            return jsonify({"msg": "No events received data"}), 400
+            return "", 200
 
         # Parse received data body
         body = list(map(lambda x: parse_body(x), body))
