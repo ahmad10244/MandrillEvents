@@ -29,6 +29,14 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
+class DbInsertEventError(Exception):
+    pass
+
+
+class DbConnectionError(Exception):
+    pass
+
+
 def get_mongodb_collection():
     db = mongo_client[os.getenv("MONGODB_DATABSE")]
     events_collection = db[os.getenv("MONGODB_DATABSE_COLLECTION")]
@@ -45,9 +53,7 @@ def handle_message(data):
         logger.info(f"\n{50*'='} \n Client disconnected SID:{request.sid} \n{50*'='}")
 
 
-@app.route("/event", methods=["POST"])
-def get_events():
-    def parse_body(event):
+def parse_body(event):
         """
         Parse event json got from webhook call
         and rename `_id` key to 'id' because of 
@@ -56,7 +62,10 @@ def get_events():
         """
         event["id"] = event.pop("_id", None)
         return event
-    
+
+
+@app.route("/event", methods=["POST"])
+def get_events():
     try:
         body = request.form.to_dict()
         body = body.get("mandrill_events")
@@ -68,16 +77,16 @@ def get_events():
             return "", 200
 
         # Parse received data body
-        body = list(map(lambda x: parse_body(x), body))
+        body = list(map(parse_body, body))
 
         try:
             # Insert events to MongoDB
             events_collection = get_mongodb_collection()
             events_collection.insert_many(body) 
         except pymongo.errors.BulkWriteError:
-            raise Exception("MongoDB insert failed")
+            raise DbInsertEventError("Database insert failed")
         except pymongo.errors.ConnectionFailure:
-            raise Exception("MongoDB connection error")
+            raise DbConnectionError("Database connection error")
 
         ret = []
         for event in list(body):
@@ -89,6 +98,9 @@ def get_events():
         socketio.send(ret, namespace="/events")
 
         return "", 200
+    except (DbInsertEventError, DbConnectionError) as ex:
+        logger.exception("@get_events")
+        return jsonify({"msg": str(ex)}), 500
     except Exception:
         logger.exception("@get_events")
         return jsonify({"msg": "Internal Error!"}), 500
