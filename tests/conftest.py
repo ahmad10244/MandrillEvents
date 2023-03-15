@@ -176,7 +176,7 @@ def app_fixture():
     """
     Create Flask app object
     """
-    yield app
+    return app
 
 
 @pytest.fixture()
@@ -184,7 +184,7 @@ def socketio_fixture():
     """
     Create Flask socketio object
     """
-    yield socketio
+    return socketio
 
 
 @pytest.fixture()
@@ -222,7 +222,7 @@ def webhook_events_json():
     """
     Create json object for webhook testing
     """
-    yield {"mandrill_events": json.dumps(mandrill_events_json["mandrill_events"])}
+    return {"mandrill_events": json.dumps(mandrill_events_json["mandrill_events"])}
 
 
 @pytest.fixture()
@@ -230,7 +230,7 @@ def webhook_events_wrong_json():
     """
     Create empty json object for webhook testing
     """
-    yield {}
+    return {}
 
 
 @pytest.fixture()
@@ -238,7 +238,7 @@ def webhook_events_empty_event_list():
     """
     Create empty event_list json object for webhook testing
     """
-    yield {"mandrill_events": json.dumps([])}
+    return {"mandrill_events": json.dumps([])}
 
 
 @pytest.fixture()
@@ -246,4 +246,4 @@ def socketio_events_emit():
     """
     Create socketio emit events json object
     """
-    yield socketio_events
+    return socketio_events
