@@ -6,8 +6,9 @@ import datetime
 import pymongo
 from flask_cors import CORS
 from flask_socketio import SocketIO
+from pymongo.collection import Collection
 from flask.logging import wsgi_errors_stream
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 
 
 app = Flask(__name__)
@@ -37,7 +38,7 @@ class DbConnectionError(Exception):
     pass
 
 
-def get_mongodb_collection():
+def get_mongodb_collection() -> Collection:
     db = mongo_client[os.getenv("MONGODB_DATABSE")]
     events_collection = db[os.getenv("MONGODB_DATABSE_COLLECTION")]
 
@@ -45,7 +46,7 @@ def get_mongodb_collection():
 
 
 @socketio.on('message', namespace="/events")
-def handle_message(data):
+def handle_message(data: json) -> None:
     event = data.get("event")
     if event == "connect":
         logger.info(f"\n{50*'='} \n Client connected SID:{request.sid} \n{50*'='}")
@@ -53,7 +54,7 @@ def handle_message(data):
         logger.info(f"\n{50*'='} \n Client disconnected SID:{request.sid} \n{50*'='}")
 
 
-def parse_body(event):
+def parse_body(event: json) -> json:
         """
         Parse event json got from webhook call
         and rename `_id` key to 'id' because of 
@@ -65,7 +66,7 @@ def parse_body(event):
 
 
 @app.route("/event", methods=["POST"])
-def get_events():
+def get_events() -> Response:
     try:
         body = request.form.to_dict()
         body = body.get("mandrill_events")
@@ -107,7 +108,7 @@ def get_events():
 
 
 @app.route('/')
-def main_page():
+def main_page() -> Response:
     return render_template("index.html")
 
 
